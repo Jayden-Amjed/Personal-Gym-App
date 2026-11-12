@@ -7,6 +7,7 @@ The interface uses black, white, and orange. Workouts retain gym and machine con
 - Canonical public source: [Personal-Gym-App](https://github.com/Jayden-Amjed/Personal-Gym-App).
 - Live private app: [Repbook](https://jayden-repbook.lucentflair1.chatgpt.site). Check [PROJECT_STATUS.md](PROJECT_STATUS.md) for actual deployment and verification state.
 - Phone setup: [Install on iPhone](docs/IPHONE.md). The installed Home Screen web app uses the hosted service; the computer does not need to remain on.
+- New computer or session: [ONBOARDING.md](ONBOARDING.md) covers setup, cross-device work, and publishing updates.
 - Start future work with [AGENTS.md](AGENTS.md), [WORKFLOW.md](WORKFLOW.md), [preferences](docs/PREFERENCES.md), and [decisions](docs/DECISIONS.md).
 
 ## Development
