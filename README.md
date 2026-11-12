@@ -5,7 +5,7 @@ Jayden's gym and nutrition journal, built for iPhone 14 and desktop. Choose El C
 The interface uses black, white, and orange. Workouts retain gym and machine context. Schema v1 uses pounds. Food totals come from manually entered calories, protein, carbs, and fat.
 
 - Canonical public source: [Personal-Gym-App](https://github.com/Jayden-Amjed/Personal-Gym-App).
-- Private app target: [Repbook](https://jayden-repbook.lucentflair1.chatgpt.site). Check [PROJECT_STATUS.md](PROJECT_STATUS.md) for actual deployment and verification state.
+- Live private app: [Repbook](https://jayden-repbook.lucentflair1.chatgpt.site). Check [PROJECT_STATUS.md](PROJECT_STATUS.md) for actual deployment and verification state.
 - Phone setup: [Install on iPhone](docs/IPHONE.md). The installed Home Screen web app uses the hosted service; the computer does not need to remain on.
 - Start future work with [AGENTS.md](AGENTS.md), [WORKFLOW.md](WORKFLOW.md), [preferences](docs/PREFERENCES.md), and [decisions](docs/DECISIONS.md).
 
@@ -36,7 +36,7 @@ npx drizzle-kit generate
 Build to generate `dist/server/wrangler.json`, then apply each pending SQL migration to the local preview database, substituting the actual migration filename:
 
 ```text
-node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_your_migration.sql
+node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_glamorous_puma.sql
 ```
 
 Do not replay already-applied migrations. This command changes only local preview data; production migration handling belongs to the Sites deployment workflow.
