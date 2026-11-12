@@ -2,7 +2,11 @@
 
 Reviewed: 2026-11-12 (America/Los_Angeles).
 
-State Version: 3 — initial foundation accepted on GitHub and deployed privately.
+State Version: 4 — onboarding documentation added; deployed application remains unchanged.
+
+Documentation update: `codex/GYM-001-onboarding` adds [ONBOARDING.md](ONBOARDING.md) for a new device/workspace/session, including clone/setup, local D1, cross-device synchronization, existing-Site publication, data protection, and a reusable handoff prompt. README and AGENTS link to it. This documentation update is based on source receipt `f84261bebf0f4292f0d2ec99470a94805831f9a4`; its integration is recorded by the GitHub PR/history. No app redeployment is needed for these Markdown changes.
+
+Documentation validation: relative Markdown links resolve; whitespace checks and an independent review passed. Application files are unchanged. CI and integration evidence for this update belong to its PR.
 
 ## Current state
 

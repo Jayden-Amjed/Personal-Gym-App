@@ -4,6 +4,8 @@ This repository is Jayden's personal gym and nutrition app. Keep this guide and 
 
 ## Start every substantive session
 
+For a new checkout, device, or agent session, use [ONBOARDING.md](ONBOARDING.md) for setup and the source-to-publication handoff.
+
 1. Read this file, [PROJECT_STATUS.md](PROJECT_STATUS.md), [WORKFLOW.md](WORKFLOW.md), [preferences](docs/PREFERENCES.md), and relevant [decisions](docs/DECISIONS.md).
 2. Check the working directory, `git status --short --branch`, exact HEAD, configured remotes, and active branches/PRs. Fetch and compare remote main when available. Preserve unfamiliar changes and investigate before editing overlapping files.
 3. Identify the requested scope, relevant implementation, acceptance checks, and next smallest useful action. Read additional code/docs only as needed.
