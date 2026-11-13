@@ -2,13 +2,13 @@
 
 Reviewed: 2026-11-12 (America/Los_Angeles).
 
-State Version: 7 — PR #4 rebuilt and migration preservation verified; publication retry remains blocked by Sites client compatibility.
+State Version: 8 — GYM-003 published to the existing owner-private Site; automatic iPhone delivery remains unverified.
 
 ## Current change
 
 Task `GYM-003`, branch `codex/GYM-003-notification-setup`, removes all speech synthesis, voice controls, and voice guidance. The automatic countdown now sits inside the matching exercise card after a new set, moves when another exercise is logged, and remains floating on other app tabs or while viewing another workout. Deadlines, reload/cross-tab coordination, push scheduling and cancellation are preserved. Editing a set does not restart rest.
 
-The candidate also corrects QStash's rejected redaction header and adds a shared D1 VAPID authorization cache for Apple's token-reuse requirement. Migration `0002_vapid_token_cache.sql` adds only the cache table; it must accompany this source. The user chose push notifications without speech after confirming the direct phone test. New source has not been published.
+The update also corrects QStash's rejected redaction header and adds a shared D1 VAPID authorization cache for Apple's token-reuse requirement. Migration `0002_vapid_token_cache.sql` adds only the cache table; it was included in the release and applied to production. The user chose push notifications without speech after confirming the direct phone test.
 
 Previously released `GYM-002` adds rear-delt fly to new Pull sessions; editable rest defaults (150 seconds compound, 90 seconds isolation/abs); immutable new-set machine, order, and prior-muscle-work context; comparable historical sets; session deletion; and optional private completion photos. Photos include front/back muscle diagrams highlighting all primary and assisting muscles from logged exercises, plus workout and date. The main README is generalized.
 
@@ -19,16 +19,22 @@ The owner supplied the EU QStash token through a masked Windows credential promp
 ## Source and release
 
 - Canonical GitHub repository: [Jayden-Amjed/Repbook](https://github.com/Jayden-Amjed/Repbook); older Personal-Gym-App links redirect. Freshly fetched main remains `0bd13e2c69c24863102c1f1be9061eeaaca51252`. [PR #4](https://github.com/Jayden-Amjed/Repbook/pull/4) is open and unmerged; its verified implementation is `9e33f3d7374e5b726f09868d4561314a054eda9e` on the branch above. [GitHub Actions run 43356214875](https://github.com/Jayden-Amjed/Repbook/actions/runs/43356214875) succeeded for that implementation.
-- Implementation/deployed source: `e4cd47edca3b0f35e4ff62b6bed842103d191693`. [PR #2](https://github.com/Jayden-Amjed/Repbook/pull/2) merged as `e7f0476677a94339639f90de0778919fe9743e6d`. [GitHub Actions run 43351764630](https://github.com/Jayden-Amjed/Repbook/actions/runs/43351764630) passed locked install, tests, TypeScript, and build.
+- Previous GYM-002 deployed source: `e4cd47edca3b0f35e4ff62b6bed842103d191693`. [PR #2](https://github.com/Jayden-Amjed/Repbook/pull/2) merged as `e7f0476677a94339639f90de0778919fe9743e6d`. [GitHub Actions run 43351764630](https://github.com/Jayden-Amjed/Repbook/actions/runs/43351764630) passed locked install, tests, TypeScript, and build.
 - Private deployment `appgdep_6af674a8e8d4819183e304045cb2e9ad` succeeded at 2026-11-13T02:23:45Z (2026-11-12 local), saved version `appgprj_6af63f525dfc8191ad3be9f66bbd141d~appgver_837d2329bc988191bc5ec08c62756290`, environment revision 0. The Sites helper pushed the exact implementation source and packaged the local build before deployment. This later documentation receipt does not change app code or require redeployment.
 - Post-deploy read-only database inspection confirms the original `journals` table plus `push_subscriptions`, `push_timers`, and `session_photos`. Browser navigation confirms the private sign-in gate; a fresh authenticated live-app check needs the owner's login in this browser. No production fixtures were created.
 - Existing owner-private Site: `appgprj_6af63f525dfc8191ad3be9f66bbd141d`; [live app](https://jayden-repbook.lucentflair1.chatgpt.site). Audience remains owner-only.
 - GYM-003 activation: redeployed the same saved version 2 / implementation `e4cd47edca3b0f35e4ff62b6bed842103d191693` with environment revision 1. Deployment `appgdep_6af67907da58819195f74b62c5f12a6f` succeeded at 2026-11-13T02:42:21Z. Credentials are configured; delivery is not inferred from deployment success.
-- Source-publication blocker: `create_source_repository_write_credential` returned `sites_git_client_upgrade_required` (409), requiring a hosted Work session or a supported updated Codex/Sites client. The earlier source credential is expired. New application source has not been uploaded or deployed. The live app still has the voice UI, separate timer card, rejected redaction header, and per-set VAPID signing. This is a client/backend compatibility error, not an approval rejection.
+- GYM-003 production release: Sites saved version 3 (`appgprj_6af63f525dfc8191ad3be9f66bbd141d~appgver_b3aeed8374ec8191886d3d1cffd04b33`) deployed successfully as `appgdep_6af683593db48191869c10ebbf333520` at `2026-11-13T03:26:25Z` (November 12, 7:26:25 p.m. PST). Saved source is `a562b81d3274b58272483bd1fbcda51853ce9f7a`. The Sites mirror fast-forwarded from `e4cd47edca3b0f35e4ff62b6bed842103d191693`; GitHub main was untouched and PR #4 remains open. The deployment kept the existing hosting manifest and its D1 `DB` and R2 `BUCKET` bindings.
 - A read-only production inspection confirmed one cloud D1 journal (revision 27 at inspection). Journal contents and test photos were not copied into source. No synthetic production records were written.
 - D1 stores the journal and photo metadata; private R2 stores original and composite JPEGs. Authenticated ownership checks guard both metadata and bytes. Deletion tombstones hide images before storage cleanup; failed cleanup can retry on later journal saves.
 
 ## Verification actually completed
+
+Hosted ChatGPT Work, 2026-11-12:
+
+- Verified Linux x86_64, `SITES_MANAGED_LINUX_CONTAINER=1`, Node 24.22.1, Codex CLI 0.167.0-alpha.4, Sites plugin 1.1.6, and runtime bundle 26.1111.10930. Sites granted source access and its helper opened the existing mirror before dependency installation or build, resolving the earlier local-client 409 for this deployment.
+- Locked installation and the Sites production build passed. The helper pushed the exact GitHub branch head and packaged the Worker, migration 0002, and Drizzle metadata. Verified the archive's hosting manifest and migration contents against source. Existing Windows and GitHub Actions test evidence is recorded below.
+- The read-only D1 overview showed `push_vapid_tokens` after deployment, alongside the four pre-existing tables. Access revision 1 remained owner-only with zero external visitors. Environment revision 1 retained all four notification secrets. No production journal or photo test writes and no notification sends were performed.
 
 Publication retry, Windows / Node 24.22.1, 2026-11-12:
 
@@ -61,7 +67,7 @@ Previously completed GYM-002 checks, isolated loopback preview, 2026-11-12; not 
 
 ## Limits and next action
 
-Next, publish the GYM-003 source and migration using a supported Sites client, preserving the existing private Site, audience, database, bucket, and environment revision. Credentials are already configured; do not collect them again. Then verify inline/floating countdowns and the real Log set → Notification scheduled → locked-phone push flow, including replacement/cancellation. Do not infer automatic scheduling success from the direct provider test. Voice is no longer requested.
+Next, verify inline/floating countdowns and the real Log set → Notification scheduled → locked-phone push flow on the iPhone, including replacement and cancellation. The earlier direct provider test remains separate evidence. Voice is no longer requested.
 
 Finishing/deleting on a different device does not yet revoke a notification queued by the first device; cancellation at delivery time or after an unknown provider acknowledgement may still allow an alert. Provider acceptance does not guarantee device delivery.
 
