@@ -2,7 +2,7 @@
 
 Reviewed: 2026-11-12 (America/Los_Angeles).
 
-State Version: 10 — GYM-005 History charts implemented and locally verified; publication pending. GYM-004 remains live.
+State Version: 10 — GYM-005 History charts published to the existing owner-private Repbook Site.
 
 ## Current change
 
@@ -28,7 +28,8 @@ The owner supplied the EU QStash token through a masked Windows credential promp
 
 ## Source and release
 
-- GYM-005 starts from GYM-004 receipt `b515a5b1e12be2149c4c4452b359d6d87ddc44d3`; freshly fetched main remains `0bd13e2c69c24863102c1f1be9061eeaaca51252`. The candidate is stacked on GYM-004 to preserve its already deployed app changes. Do not deploy main or merge the stacked PRs as part of publication. Exact implementation/PR and deployment evidence will be recorded after commit/publication.
+- GYM-005 source `ab5517cf0f31439554a70b172f4f065d5b32012f` is based on GYM-004 receipt `b515a5b1e12be2149c4c4452b359d6d87ddc44d3`. [PR #6](https://github.com/Jayden-Amjed/Repbook/pull/6) remains open and stacked on GYM-004. The Sites mirror fast-forwarded from version 4 source `fb647cec983eb79a5842054e6ab49505b0c772fd`.
+- GYM-005 production release: Sites independently confirmed version 5 (`appgprj_6af63f525dfc8191ad3be9f66bbd141d~appgver_7319c670b4a481919aff0c412e239037`) points to that exact GYM-005 source. Deployment `appgdep_6af69359cf7c8191bb6b12bac6cbd751` succeeded at `2026-11-13T04:34:41.356400Z` (November 12, 8:34:41 p.m. PST) on the existing [private Site](https://jayden-repbook.lucentflair1.chatgpt.site/).
 
 - GYM-004 source `fb647cec983eb79a5842054e6ab49505b0c772fd` is based on GYM-003 release receipt `3820fbe0193158798a102406780bd0dfefcbd8bb`. [PR #5](https://github.com/Jayden-Amjed/Repbook/pull/5) remains open and stacked on GYM-003. Publication fast-forwarded the Sites mirror from `a562b81d3274b58272483bd1fbcda51853ce9f7a` and left both PRs unmerged.
 - GYM-004 production release: Sites version 4 (`appgprj_6af63f525dfc8191ad3be9f66bbd141d~appgver_d1ca4e9217b8819198cfc51e0b810488`) independently reports that exact GYM-004 source. Deployment `appgdep_6af68b0f30388191932a860005436be5` succeeded at `2026-11-13T03:59:18.549803Z` (November 12, 7:59:18 p.m. PST) on the existing [private Site](https://jayden-repbook.lucentflair1.chatgpt.site/).
@@ -44,6 +45,12 @@ The owner supplied the EU QStash token through a masked Windows credential promp
 - D1 stores the journal and photo metadata; private R2 stores original and composite JPEGs. Authenticated ownership checks guard both metadata and bytes. Deletion tombstones hide images before storage cleanup; failed cleanup can retry on later journal saves.
 
 ## Verification actually completed
+
+GYM-005, hosted ChatGPT Work, 2026-11-12:
+
+- Verified Linux 6.18.57 x86_64, `SITES_MANAGED_LINUX_CONTAINER=1`, runtime bundle 26.1111.10930, Codex CLI 0.167.0-alpha.4, Node 24.22.1, and Sites plugin 1.1.6. The source helper opened the existing mirror before dependency installation or build.
+- [GitHub Actions run 43365983164](https://github.com/Jayden-Amjed/Repbook/actions/runs/43365983164) completed successfully for the deployed commit. Hosted locked install, production build, source push verification, and packaging passed. Verified the packaged Worker and unchanged hosting manifest, migrations, and Drizzle metadata. D1 `DB` and R2 `BUCKET` were retained. Migration 0002 remains applied.
+- Post-deployment reads confirmed the same five D1 tables, owner-only access revision 1 with zero external visitors, and all four notification secrets at environment revision 1. No production test records, photo changes, or notification sends were made.
 
 GYM-005, Windows / Node 24.22.1, 2026-11-12:
 
@@ -104,7 +111,7 @@ Previously completed GYM-002 checks, isolated loopback preview, 2026-11-12; not 
 
 ## Limits and next action
 
-Publish the tested GYM-005 source through the established hosted Work route, verifying cloud execution and Sites Git access before building there, then record the exact release. GYM-004 remains live until that succeeds. Signed-in production feature checks and physical iPhone behavior remain unverified. For GYM-003, verify the real Log set → Notification scheduled → locked-phone push flow on the iPhone, including replacement and cancellation. The earlier direct provider test remains separate evidence. Voice is no longer requested.
+GYM-005 is live. Signed-in production chart behavior and physical iPhone behavior remain unverified. For GYM-003, verify the real Log set → Notification scheduled → locked-phone push flow on the iPhone, including replacement and cancellation. The earlier direct provider test remains separate evidence. Voice is no longer requested.
 
 Finishing/deleting on a different device does not yet revoke a notification queued by the first device; cancellation at delivery time or after an unknown provider acknowledgement may still allow an alert. Provider acceptance does not guarantee device delivery.
 

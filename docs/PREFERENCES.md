@@ -69,6 +69,8 @@ The default rest classifications, anatomical mapping, storage design, and notifi
 
 ## Communication and recordkeeping
 
+Standing publishing permission, 2026-11-12. Jayden explicitly approved using the existing hosted ChatGPT Work chat that publishes Repbook for future Repbook updates he requests, without repeated cross-chat handoff confirmation. This permission is limited to user-requested updates and excludes unsolicited features and GitHub merges.
+
 GYM-005 History request, 2026-11-12: bring the body-weight, daily-calorie, and daily-rep charts into History, with month/year/all-time selectors and each chart as its own large graph. Keep historical records available beyond the Overview's seven-day display.
 
 GYM-004 food request, 2026-11-12: add reusable presets for David bars, Fairlife 30 g protein / 150 calorie shakes, all current Chipotle High Protein Cups, three chicken/cheese/mild-tomato tacos, and a tortilla, then update the existing website. The user clarified **David Gold bars (28 g protein, 150 calories)** and **crispy corn taco shells**. The large burrito side tortilla and verified current chicken/steak cup catalog are implementation interpretations, not additional user-specified variants.
