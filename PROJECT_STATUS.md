@@ -2,9 +2,15 @@
 
 Reviewed: 2026-11-12 (America/Los_Angeles).
 
-State Version: 8 — GYM-003 published to the existing owner-private Site; automatic iPhone delivery remains unverified.
+State Version: 9 — GYM-004 food presets published to the existing owner-private Repbook Site.
 
 ## Current change
+
+Task `GYM-004`, branch `codex/GYM-004-food-presets`, adds 15 source-linked presets: nine David Gold flavors, two Fairlife Nutrition Plan shakes, Chipotle chicken/steak High Protein Cups, three crispy chicken/cheese/mild-tomato tacos, and a large burrito flour tortilla. The user confirmed Gold bars and crispy corn shells. Presets fill an editable form; fractional quantities scale the original values, and saving creates an ordinary food entry on the selected date. Custom entry remains available. Invalid quantities block saving, rejected journal updates keep the dialog open, and the longer dialog scrolls on small screens.
+
+This update uses the existing journal schema and requires no new migration. It preserves all GYM-003 code and migration 0002, the existing hosting manifest, database, photos, private audience, and notification settings. Publication required no schema or configuration changes. No production test records were written and no test notifications were sent.
+
+### Already deployed behavior
 
 Task `GYM-003`, branch `codex/GYM-003-notification-setup`, removes all speech synthesis, voice controls, and voice guidance. The automatic countdown now sits inside the matching exercise card after a new set, moves when another exercise is logged, and remains floating on other app tabs or while viewing another workout. Deadlines, reload/cross-tab coordination, push scheduling and cancellation are preserved. Editing a set does not restart rest.
 
@@ -18,6 +24,9 @@ The owner supplied the EU QStash token through a masked Windows credential promp
 
 ## Source and release
 
+- GYM-004 source `fb647cec983eb79a5842054e6ab49505b0c772fd` is based on GYM-003 release receipt `3820fbe0193158798a102406780bd0dfefcbd8bb`. [PR #5](https://github.com/Jayden-Amjed/Repbook/pull/5) remains open and stacked on GYM-003. Publication fast-forwarded the Sites mirror from `a562b81d3274b58272483bd1fbcda51853ce9f7a` and left both PRs unmerged.
+- GYM-004 production release: Sites version 4 (`appgprj_6af63f525dfc8191ad3be9f66bbd141d~appgver_d1ca4e9217b8819198cfc51e0b810488`) independently reports that exact GYM-004 source. Deployment `appgdep_6af68b0f30388191932a860005436be5` succeeded at `2026-11-13T03:59:18.549803Z` (November 12, 7:59:18 p.m. PST) on the existing [private Site](https://jayden-repbook.lucentflair1.chatgpt.site/).
+
 - Canonical GitHub repository: [Jayden-Amjed/Repbook](https://github.com/Jayden-Amjed/Repbook); older Personal-Gym-App links redirect. Freshly fetched main remains `0bd13e2c69c24863102c1f1be9061eeaaca51252`. [PR #4](https://github.com/Jayden-Amjed/Repbook/pull/4) is open and unmerged; its verified implementation is `9e33f3d7374e5b726f09868d4561314a054eda9e` on the branch above. [GitHub Actions run 43356214875](https://github.com/Jayden-Amjed/Repbook/actions/runs/43356214875) succeeded for that implementation.
 - Previous GYM-002 deployed source: `e4cd47edca3b0f35e4ff62b6bed842103d191693`. [PR #2](https://github.com/Jayden-Amjed/Repbook/pull/2) merged as `e7f0476677a94339639f90de0778919fe9743e6d`. [GitHub Actions run 43351764630](https://github.com/Jayden-Amjed/Repbook/actions/runs/43351764630) passed locked install, tests, TypeScript, and build.
 - Private deployment `appgdep_6af674a8e8d4819183e304045cb2e9ad` succeeded at 2026-11-13T02:23:45Z (2026-11-12 local), saved version `appgprj_6af63f525dfc8191ad3be9f66bbd141d~appgver_837d2329bc988191bc5ec08c62756290`, environment revision 0. The Sites helper pushed the exact implementation source and packaged the local build before deployment. This later documentation receipt does not change app code or require redeployment.
@@ -30,7 +39,21 @@ The owner supplied the EU QStash token through a masked Windows credential promp
 
 ## Verification actually completed
 
-Hosted ChatGPT Work, 2026-11-12:
+GYM-004, hosted ChatGPT Work, 2026-11-12:
+
+- Verified Linux 6.18.57 x86_64, `SITES_MANAGED_LINUX_CONTAINER=1`, runtime bundle 26.1111.10930, Codex CLI 0.167.0-alpha.4, Node 24.22.1, and Sites plugin 1.1.6. The Sites helper opened the existing mirror before dependency installation or build.
+- [GitHub Actions run 43362156189](https://github.com/Jayden-Amjed/Repbook/actions/runs/43362156189) passed locked install, tests, TypeScript, and build for this commit. Hosted locked install, production build, and source packaging passed. The package contained the Worker, identical hosting manifest with D1 `DB` and R2 `BUCKET`, and unchanged migrations and Drizzle metadata. No new migration was needed.
+- Post-publication verification confirmed the saved source, owner-only access revision 1 with zero external visitors, and all four notification secrets at environment revision 1. The read-only `DB` overview listed the same five tables, including `journals`, `session_photos`, and the existing `push_vapid_tokens`. Signed-in production food logging and physical iPhone behavior were not tested.
+
+GYM-004, Windows / Node 24.22.1, 2026-11-12:
+
+- `node --experimental-strip-types --test tests/*.test.ts`: 35/35 passed. New checks cover label-preserving fractional scaling, invalid quantities, ordinary journal serialization with old entries unchanged, manual corrections, taco portions, and catalog validation.
+- `node node_modules/typescript/bin/tsc --noEmit`, Sites `build-site.mjs` / `npm run build`, and `git diff --check`: passed. The final production build includes the dialog scrolling fix.
+- Independent source review found no actionable quantity, date, validation, or historical-data regressions.
+- Browser QA used the actual FoodForm and app CSS in an ignored loopback-only harness, with synthetic in-memory saves. Verified double servings with a manual calorie correction, half a bar, invalid quantity blocking, selected-date preservation, manual entry, and rejected-save feedback. At 390 × 844, the dialog scrolls and has no horizontal overflow. Preview/server stopped afterward. This is component QA, not an authenticated full-app persistence or physical-iPhone test. No production journal/photo records were touched.
+- Official David/Fairlife product labels and Chipotle menu/ingredient nutrition were checked on this date. Sources and standard-serving assumptions are retained in the catalog and decisions.
+
+GYM-003, hosted ChatGPT Work, 2026-11-12:
 
 - Verified Linux x86_64, `SITES_MANAGED_LINUX_CONTAINER=1`, Node 24.22.1, Codex CLI 0.167.0-alpha.4, Sites plugin 1.1.6, and runtime bundle 26.1111.10930. Sites granted source access and its helper opened the existing mirror before dependency installation or build, resolving the earlier local-client 409 for this deployment.
 - Locked installation and the Sites production build passed. The helper pushed the exact GitHub branch head and packaged the Worker, migration 0002, and Drizzle metadata. Verified the archive's hosting manifest and migration contents against source. Existing Windows and GitHub Actions test evidence is recorded below.
@@ -67,7 +90,7 @@ Previously completed GYM-002 checks, isolated loopback preview, 2026-11-12; not 
 
 ## Limits and next action
 
-Next, verify inline/floating countdowns and the real Log set → Notification scheduled → locked-phone push flow on the iPhone, including replacement and cancellation. The earlier direct provider test remains separate evidence. Voice is no longer requested.
+GYM-004 is live. Signed-in production food logging and physical iPhone behavior remain unverified. For GYM-003, verify the real Log set → Notification scheduled → locked-phone push flow on the iPhone, including replacement and cancellation. The earlier direct provider test remains separate evidence. Voice is no longer requested.
 
 Finishing/deleting on a different device does not yet revoke a notification queued by the first device; cancellation at delivery time or after an unknown provider acknowledgement may still allow an alert. Provider acceptance does not guarantee device delivery.
 

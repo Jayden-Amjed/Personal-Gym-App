@@ -13,7 +13,13 @@ The responsive interface uses black, white, and orange, with Home Screen install
 - Optional Web Push scheduling for locked-screen alerts, when the notification service is configured. Delivery depends on the device and notification settings.
 - Session deletion, completion history, and missed-exercise flags.
 - Optional private session photos with front/back muscle diagrams and workout/date overlays.
-- Manual nutrition totals, bodyweight charts, and JSON journal exports.
+- Food presets with adjustable servings and editable nutrition totals, custom food entry, bodyweight charts, and JSON journal exports.
+
+## Food presets
+
+Choose a preset in **Log food**, set the servings eaten (including fractions), and review or edit its totals before saving. Changing the preset or servings resets the suggested name and nutrition. Existing logged foods keep their saved values.
+
+The initial catalog includes David Gold bars, Fairlife Nutrition Plan chocolate/vanilla shakes, Chipotle chicken/steak High Protein Cups, three crispy chicken tacos with cheese and mild tomato salsa, and a large burrito flour tortilla. Each preset links to its official nutrition source. Values were checked on November 12, 2026; product labels and restaurant portions can differ. The taco preset uses three shells with one total standard portion of each filling across the order. Seasonal cup variants without a current verified label are not included.
 
 ## Development
 
