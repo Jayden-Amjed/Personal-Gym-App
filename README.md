@@ -9,8 +9,8 @@ The responsive interface uses black, white, and orange, with Home Screen install
 - Configurable gyms and Push, Pull, Legs, Upper, and Lower routines.
 - Weight, reps, machine, and actual set order recorded with each new set.
 - Muscle-workload context for comparing equivalent sets across sessions. Earlier records retain unknown order.
-- Automatic exercise-specific rest timers with optional on-device spoken alerts.
-- Optional Web Push scheduling for locked-screen alerts, when the notification service is configured. Delivery and spoken announcements depend on the device and notification settings.
+- Automatic rest countdowns inside the active exercise card, continuing across app tabs.
+- Optional Web Push scheduling for locked-screen alerts, when the notification service is configured. Delivery depends on the device and notification settings.
 - Session deletion, completion history, and missed-exercise flags.
 - Optional private session photos with front/back muscle diagrams and workout/date overlays.
 - Manual nutrition totals, bodyweight charts, and JSON journal exports.
@@ -33,7 +33,7 @@ For a built local Worker preview, run `npm start` after building. Local state is
 
 The authenticated journal is stored in Cloudflare D1. Revision checks reject stale writes instead of silently overwriting another device's changes. Browser recovery drafts protect pending edits; they are not a cloud backup. Session images are stored privately in R2, with ownership and workout metadata in D1. Image requests require authentication.
 
-Workout logging, charts, photo overlays, and spoken rest alerts do not call an AI model. Normal use does call the app's data API. Optional push notifications use a configured delivery service; hosting, storage, and notification-provider limits are separate from AI token usage.
+Workout logging, charts, photo overlays, and rest alerts do not call an AI model. Normal use does call the app's data API. Optional push notifications use a configured delivery service; hosting, storage, and notification-provider limits are separate from AI token usage.
 
 Keep credentials, personal exports, photos, database files, and recovery data out of Git. JSON export contains journal records; download session photos separately. Import and automatic conflict merging are not implemented. Internet is required for cloud load/sync, and full offline cold-launch editing is not available. All recorded weights use pounds.
 

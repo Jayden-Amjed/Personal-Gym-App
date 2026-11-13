@@ -5,6 +5,7 @@ import { getDb } from "../../../db/index";
 import { journals } from "../../../db/schema";
 import { pushSubscriptions, pushTimers } from "../../../db/push-schema";
 import { validateState } from "../../../lib/model";
+import { getCachedVapidAuthorization } from "../../../lib/vapid-cache";
 import { DeviceIdSchema, PushActionSchema, PushRequestError, SubscriptionSchema, cancelPush, getPushConfig, pushDeduplicationId, schedulePush, verifySavedTimer, type PushConfig } from "../../../lib/push-service";
 
 export const dynamic = "force-dynamic";
@@ -135,8 +136,9 @@ export async function POST(request: Request) {
       const beforeDevice = await db.select({ timerId: pushSubscriptions.activeTimerId }).from(pushSubscriptions).where(deviceScope(userId, deviceId)).get();
       if (beforePublish?.status !== "publishing" || beforePublish.operationId !== operationId || beforeDevice?.timerId !== timer.id || saved.endsAt <= Date.now()) throw new PushRequestError("This rest timer was canceled or expired.", 409);
       const deduplicationId = await pushDeduplicationId(userId, deviceId, timer.id);
+      const authorization = await getCachedVapidAuthorization(env.DB!, config, subscription.endpoint, saved.endsAt);
       publicationStarted = true;
-      messageId = await schedulePush(config, subscription, { id: timer.id, endsAt: saved.endsAt }, deduplicationId);
+      messageId = await schedulePush(config, subscription, { id: timer.id, endsAt: saved.endsAt }, deduplicationId, authorization);
       await db.update(pushTimers).set({ messageId }).where(and(timerScope(userId, deviceId, timer.id), eq(pushTimers.operationId, operationId)));
       const active = await db.select({ timerId: pushSubscriptions.activeTimerId }).from(pushSubscriptions).where(deviceScope(userId, deviceId)).get();
       const finalized = active?.timerId === timer.id ? await db.update(pushTimers).set({ status: "scheduled", updatedAt: Date.now() }).where(and(timerScope(userId, deviceId, timer.id), eq(pushTimers.operationId, operationId), eq(pushTimers.status, "publishing"))).returning({ timerId: pushTimers.timerId }) : [];
