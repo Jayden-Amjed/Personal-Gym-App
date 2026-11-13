@@ -14,6 +14,9 @@ The responsive interface uses black, white, and orange, with Home Screen install
 - Session deletion, completion history, and missed-exercise flags.
 - Optional private session photos with front/back muscle diagrams and workout/date overlays.
 - Food presets with adjustable servings and editable nutrition totals, custom food entry, bodyweight charts, and JSON journal exports.
+- Large History charts for weight, calories, and reps, each with independent month, year, and all-time controls and accessible point details.
+
+History keeps the session list below the charts. Month views show daily entries; year views group by month. All-time views include every recorded date through today, grouped by month (or by year beyond ten years). Weight uses average logged weigh-ins in grouped views, calories use average daily totals on logged days, and reps use summed logged reps. Missing dates remain empty. These chart summaries do not change stored records.
 
 ## Food presets
 

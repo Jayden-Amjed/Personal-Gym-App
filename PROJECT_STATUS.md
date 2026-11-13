@@ -2,15 +2,19 @@
 
 Reviewed: 2026-11-12 (America/Los_Angeles).
 
-State Version: 9 — GYM-004 food presets published to the existing owner-private Repbook Site.
+State Version: 10 — GYM-005 History charts published to the existing owner-private Repbook Site.
 
 ## Current change
+
+Task `GYM-005`, branch `codex/GYM-005-history-charts`, adds three large, stacked History graphs for body weight, calories, and reps. Each chart has independent Month, Year, and All time controls, calendar navigation, and direct month/year selection. Month shows daily records; longer ranges use labelled averages for weight/calories and totals for reps. All-time projection includes every recorded date through today, with yearly grouping beyond 120 months. Missing records remain gaps, while logged zero values remain valid. Hover/tap/keyboard details and a data table expose exact chart values. Overview and the History session list remain available.
+
+This is a read-only projection of the existing journal: no schema/migration, API, hosting manifest, database, photo, access, or notification-secret changes are required. Previous food presets and notification fixes remain included. No production test writes or configuration changes occurred for GYM-005.
+
+### Already deployed behavior
 
 Task `GYM-004`, branch `codex/GYM-004-food-presets`, adds 15 source-linked presets: nine David Gold flavors, two Fairlife Nutrition Plan shakes, Chipotle chicken/steak High Protein Cups, three crispy chicken/cheese/mild-tomato tacos, and a large burrito flour tortilla. The user confirmed Gold bars and crispy corn shells. Presets fill an editable form; fractional quantities scale the original values, and saving creates an ordinary food entry on the selected date. Custom entry remains available. Invalid quantities block saving, rejected journal updates keep the dialog open, and the longer dialog scrolls on small screens.
 
 This update uses the existing journal schema and requires no new migration. It preserves all GYM-003 code and migration 0002, the existing hosting manifest, database, photos, private audience, and notification settings. Publication required no schema or configuration changes. No production test records were written and no test notifications were sent.
-
-### Already deployed behavior
 
 Task `GYM-003`, branch `codex/GYM-003-notification-setup`, removes all speech synthesis, voice controls, and voice guidance. The automatic countdown now sits inside the matching exercise card after a new set, moves when another exercise is logged, and remains floating on other app tabs or while viewing another workout. Deadlines, reload/cross-tab coordination, push scheduling and cancellation are preserved. Editing a set does not restart rest.
 
@@ -23,6 +27,9 @@ Journal schema v2 migrates v1 on read without inventing historical order or modi
 The owner supplied the EU QStash token through a masked Windows credential prompt; a read-only EU API request authenticated successfully (HTTP 200). All four runtime values were stored as secrets at environment revision 1. No secret values were written to project files or chat. No paid plan or billing was enabled by the agent; the account's billing plan was not independently inspected. See [notification setup and limits](docs/NOTIFICATIONS.md).
 
 ## Source and release
+
+- GYM-005 source `ab5517cf0f31439554a70b172f4f065d5b32012f` is based on GYM-004 receipt `b515a5b1e12be2149c4c4452b359d6d87ddc44d3`. [PR #6](https://github.com/Jayden-Amjed/Repbook/pull/6) remains open and stacked on GYM-004. The Sites mirror fast-forwarded from version 4 source `fb647cec983eb79a5842054e6ab49505b0c772fd`.
+- GYM-005 production release: Sites independently confirmed version 5 (`appgprj_6af63f525dfc8191ad3be9f66bbd141d~appgver_7319c670b4a481919aff0c412e239037`) points to that exact GYM-005 source. Deployment `appgdep_6af69359cf7c8191bb6b12bac6cbd751` succeeded at `2026-11-13T04:34:41.356400Z` (November 12, 8:34:41 p.m. PST) on the existing [private Site](https://jayden-repbook.lucentflair1.chatgpt.site/).
 
 - GYM-004 source `fb647cec983eb79a5842054e6ab49505b0c772fd` is based on GYM-003 release receipt `3820fbe0193158798a102406780bd0dfefcbd8bb`. [PR #5](https://github.com/Jayden-Amjed/Repbook/pull/5) remains open and stacked on GYM-003. Publication fast-forwarded the Sites mirror from `a562b81d3274b58272483bd1fbcda51853ce9f7a` and left both PRs unmerged.
 - GYM-004 production release: Sites version 4 (`appgprj_6af63f525dfc8191ad3be9f66bbd141d~appgver_d1ca4e9217b8819198cfc51e0b810488`) independently reports that exact GYM-004 source. Deployment `appgdep_6af68b0f30388191932a860005436be5` succeeded at `2026-11-13T03:59:18.549803Z` (November 12, 7:59:18 p.m. PST) on the existing [private Site](https://jayden-repbook.lucentflair1.chatgpt.site/).
@@ -38,6 +45,20 @@ The owner supplied the EU QStash token through a masked Windows credential promp
 - D1 stores the journal and photo metadata; private R2 stores original and composite JPEGs. Authenticated ownership checks guard both metadata and bytes. Deletion tombstones hide images before storage cleanup; failed cleanup can retry on later journal saves.
 
 ## Verification actually completed
+
+GYM-005, hosted ChatGPT Work, 2026-11-12:
+
+- Verified Linux 6.18.57 x86_64, `SITES_MANAGED_LINUX_CONTAINER=1`, runtime bundle 26.1111.10930, Codex CLI 0.167.0-alpha.4, Node 24.22.1, and Sites plugin 1.1.6. The source helper opened the existing mirror before dependency installation or build.
+- [GitHub Actions run 43365983164](https://github.com/Jayden-Amjed/Repbook/actions/runs/43365983164) completed successfully for the deployed commit. Hosted locked install, production build, source push verification, and packaging passed. Verified the packaged Worker and unchanged hosting manifest, migrations, and Drizzle metadata. D1 `DB` and R2 `BUCKET` were retained. Migration 0002 remains applied.
+- Post-deployment reads confirmed the same five D1 tables, owner-only access revision 1 with zero external visitors, and all four notification secrets at environment revision 1. No production test records, photo changes, or notification sends were made.
+
+GYM-005, Windows / Node 24.22.1, 2026-11-12:
+
+- `node --experimental-strip-types --test tests/*.test.ts`: 48/48 passed. Thirteen new tests cover historical inclusion, calendar/leap-year boundaries, aggregation, logged zero versus missing values, drafts with logged sets, 120/121-month grouping, future-date exclusion, chronological weight summaries, navigation, frozen-input immutability, and identical output under UTC/Los Angeles/Kiritimati time zones.
+- `node node_modules/typescript/bin/tsc --noEmit`, final Sites `build-site.mjs` / `npm run build`, and `git diff --check`: passed. No dependencies changed.
+- Independent aggregation and UI source reviews found no actionable issues.
+- Browser QA used the actual HistoryCharts and app styles in an ignored loopback harness with synthetic in-memory history. Verified independent selectors, previous-period buttons, direct month input with Enter/blur, older years, invalid future-year feedback, empty states, all-time grouping beyond ten years, touch-position details, keyboard point selection and data tables. Native month testing prompted an explicit Enter/blur commit fix, verified before the final build. Graphs measured 290 px tall at the 390 × 844 viewport, with no page/card horizontal overflow; desktop graphs are 340 px. Console errors: none. The preview/server was stopped. This is component QA, not signed-in production or physical-iPhone testing; no production fixtures were written.
+- Read-only Sites baseline still showed live version 4, owner-only access revision 1, and no external visitors. Publication must use the established hosted Work route; the local Sites Git client failure is already documented below.
 
 GYM-004, hosted ChatGPT Work, 2026-11-12:
 
@@ -90,7 +111,7 @@ Previously completed GYM-002 checks, isolated loopback preview, 2026-11-12; not 
 
 ## Limits and next action
 
-GYM-004 is live. Signed-in production food logging and physical iPhone behavior remain unverified. For GYM-003, verify the real Log set → Notification scheduled → locked-phone push flow on the iPhone, including replacement and cancellation. The earlier direct provider test remains separate evidence. Voice is no longer requested.
+GYM-005 is live. Signed-in production chart behavior and physical iPhone behavior remain unverified. For GYM-003, verify the real Log set → Notification scheduled → locked-phone push flow on the iPhone, including replacement and cancellation. The earlier direct provider test remains separate evidence. Voice is no longer requested.
 
 Finishing/deleting on a different device does not yet revoke a notification queued by the first device; cancellation at delivery time or after an unknown provider acknowledgement may still allow an alert. Provider acceptance does not guarantee device delivery.
 
