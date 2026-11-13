@@ -4,6 +4,7 @@ import { getChatGPTUser } from "../../chatgpt-auth";
 import { getDb } from "../../../db/index";
 import { journals } from "../../../db/schema";
 import { newState, StateSchema, validateState } from "../../../lib/model";
+import { removeDeletedWorkoutPhotos } from "../../../lib/photo-service";
 
 export const dynamic = "force-dynamic";
 const MAX_BODY_BYTES = 1_500_000;
@@ -52,7 +53,9 @@ export async function PUT(request: Request) {
   try {
     const raw = await readBoundedBody(request);
     if (raw === null) return json({ error: "This journal is too large to save. Export a backup and contact the app maintainer." }, 413);
-    const parsed = Envelope.safeParse(JSON.parse(raw));
+    const decoded = JSON.parse(raw);
+    if (decoded?.state?.schemaVersion === 1) return json({ error: "Repbook was updated. Export unsynced entries, then reload to continue with the new journal format." }, 409);
+    const parsed = Envelope.safeParse(decoded);
     if (!parsed.success) return json({ error: "Some entries are invalid. Check dates, positive rep counts, and nonnegative weights and nutrients.", issues: parsed.error.issues.slice(0, 5).map(issue => ({ path: issue.path.join("."), message: issue.message })) }, 400);
     body = parsed.data;
   } catch {
@@ -68,6 +71,9 @@ export async function PUT(request: Request) {
       ? await db.insert(journals).values({ userId: user.userId, ...values }).onConflictDoNothing().returning({ revision: journals.revision })
       : await db.update(journals).set(values).where(and(eq(journals.userId, user.userId), eq(journals.revision, body.revision))).returning({ revision: journals.revision });
     if (changed.length === 0) return json({ error: "Your journal changed in another window or device. Export your unsynced entries before reloading the latest journal.", conflict: true }, 409);
+    // The journal commit is already durable. Cleanup failure must not report it
+    // as an unsaved write; private photo reads also reject deleted workouts.
+    await removeDeletedWorkoutPhotos(user.userId, body.state.workouts.map(workout => workout.id)).catch(() => {});
     return json({ revision: nextRevision });
   } catch {
     return json({ error: "Your changes could not be saved. Keep this window open and retry." }, 503);

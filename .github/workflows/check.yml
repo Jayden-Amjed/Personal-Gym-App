@@ -21,7 +21,7 @@ jobs:
       - name: Install locked dependencies
         run: npm ci
       - name: Test journal model
-        run: node --experimental-strip-types --test tests/model.test.ts
+        run: npm test
       - name: Check TypeScript
         run: npx tsc --noEmit
       - name: Build app
