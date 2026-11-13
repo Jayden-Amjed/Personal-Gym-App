@@ -2,7 +2,7 @@
 
 Reviewed: 2026-11-12 (America/Los_Angeles).
 
-State Version: 6 — push-only inline timer and notification fixes prepared; direct phone push confirmed, new source publication blocked.
+State Version: 7 — PR #4 rebuilt and migration preservation verified; publication retry remains blocked by Sites client compatibility.
 
 ## Current change
 
@@ -18,7 +18,7 @@ The owner supplied the EU QStash token through a masked Windows credential promp
 
 ## Source and release
 
-- Canonical GitHub repository: [Jayden-Amjed/Repbook](https://github.com/Jayden-Amjed/Repbook); older Personal-Gym-App links redirect. Freshly fetched main is `0bd13e2c69c24863102c1f1be9061eeaaca51252` before GYM-003 finalization. GYM-003 remains a source candidate on the branch above.
+- Canonical GitHub repository: [Jayden-Amjed/Repbook](https://github.com/Jayden-Amjed/Repbook); older Personal-Gym-App links redirect. Freshly fetched main remains `0bd13e2c69c24863102c1f1be9061eeaaca51252`. [PR #4](https://github.com/Jayden-Amjed/Repbook/pull/4) is open and unmerged; its verified implementation is `9e33f3d7374e5b726f09868d4561314a054eda9e` on the branch above. [GitHub Actions run 43356214875](https://github.com/Jayden-Amjed/Repbook/actions/runs/43356214875) succeeded for that implementation.
 - Implementation/deployed source: `e4cd47edca3b0f35e4ff62b6bed842103d191693`. [PR #2](https://github.com/Jayden-Amjed/Repbook/pull/2) merged as `e7f0476677a94339639f90de0778919fe9743e6d`. [GitHub Actions run 43351764630](https://github.com/Jayden-Amjed/Repbook/actions/runs/43351764630) passed locked install, tests, TypeScript, and build.
 - Private deployment `appgdep_6af674a8e8d4819183e304045cb2e9ad` succeeded at 2026-11-13T02:23:45Z (2026-11-12 local), saved version `appgprj_6af63f525dfc8191ad3be9f66bbd141d~appgver_837d2329bc988191bc5ec08c62756290`, environment revision 0. The Sites helper pushed the exact implementation source and packaged the local build before deployment. This later documentation receipt does not change app code or require redeployment.
 - Post-deploy read-only database inspection confirms the original `journals` table plus `push_subscriptions`, `push_timers`, and `session_photos`. Browser navigation confirms the private sign-in gate; a fresh authenticated live-app check needs the owner's login in this browser. No production fixtures were created.
@@ -29,6 +29,14 @@ The owner supplied the EU QStash token through a masked Windows credential promp
 - D1 stores the journal and photo metadata; private R2 stores original and composite JPEGs. Authenticated ownership checks guard both metadata and bytes. Deletion tombstones hide images before storage cleanup; failed cleanup can retry on later journal saves.
 
 ## Verification actually completed
+
+Publication retry, Windows / Node 24.22.1, 2026-11-12:
+
+- Confirmed the clean local checkout and fetched GYM-003 branch exactly matched PR #4 implementation `9e33f3d7374e5b726f09868d4561314a054eda9e`; no application source changes were needed.
+- Reran `node --experimental-strip-types --test tests/*.test.ts` (the `npm test` script): 31/31 passed. `node node_modules/typescript/bin/tsc --noEmit`, the installed Sites `build-site.mjs` / `npm run build`, and `git diff --check` passed. Worker build output exists at `dist/server/index.js`; migration 0002 and its Drizzle metadata remain in the source.
+- Independent read-only review found no data-preservation blocker. An isolated in-memory SQLite check applied 0000/0001, inserted synthetic rows in all four existing tables, applied 0002, and confirmed every prior row remained identical with an empty new cache table. No production records were used.
+- Live read-only checks confirmed saved version 2, owner-only access (access revision 1, no external visitors), and all four notification settings still marked secret at environment revision 1. The live `DB` still has `journals`, `push_subscriptions`, `push_timers`, and `session_photos`; `push_vapid_tokens` is absent, confirming 0002 has not been applied there.
+- A fresh source-write credential request again returned `sites_git_client_upgrade_required` (HTTP 409): Sites Git is not enabled for this client. No source upload, deployment, production migration, environment/access change, or database/photo write occurred. The supported recovery remains a hosted Work session or an updated Codex/Sites client with Sites Git enabled. No browser or physical-phone check was rerun.
 
 GYM-003, Windows / Node 24.22.1, 2026-11-12:
 
