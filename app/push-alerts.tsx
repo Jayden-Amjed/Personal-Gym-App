@@ -244,7 +244,6 @@ export function RestPushSettings({ controller }: { controller: RestPushControlle
     {loading ? <p className="muted">Checking notification setup…</p> : !checked ? <p className="rest-timer-limit">Notification settings are unavailable right now.</p> : !configured ? <p className="rest-timer-limit">Locked-screen alerts need service setup. The open-app timer still works.</p> : !supported ? <p className="rest-timer-limit">{support}</p> : <>
       <button type="button" className="button secondary" disabled={busy || !workerReady} onClick={() => void (subscribed ? disable() : enable())}>{subscribed ? <BellOff size={15} /> : <Bell size={15} />}{busy ? "Updating…" : subscribed ? "Turn off notifications" : "Enable notifications"}</button>
       {subscribed && <p className="rest-timer-limit">{backgroundScheduled ? "Notification scheduled for the current set." : scheduling ? "Scheduling this set's notification…" : "Notifications are on. An alert is scheduled after each new set saves."}</p>}
-      <p className="rest-timer-limit">AirPods announcements depend on your iPhone settings and support for this app. Delivery and spoken announcements need a test on your phone.</p>
     </>}
     {notice && <p className="rest-timer-notice" role="status">{notice}</p>}
     {error && <p className="rest-timer-warning" role="status">{error} <button type="button" className="text-button" onClick={retry}>Retry</button></p>}

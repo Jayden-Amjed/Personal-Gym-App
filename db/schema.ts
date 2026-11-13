@@ -22,4 +22,4 @@ export const sessionPhotos = sqliteTable("session_photos", {
   deletedAt: text("deleted_at"),
 }, table => [uniqueIndex("session_photos_user_workout").on(table.userId, table.workoutId)]);
 
-export { pushSubscriptions, pushTimers } from "./push-schema";
+export { pushSubscriptions, pushTimers, vapidTokens } from "./push-schema";

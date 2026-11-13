@@ -17,12 +17,13 @@ function fixtures() {
   const subscription = { endpoint: "https://web.push.apple.com/test-fixture", keys: { p256dh: key.getPublicKey().toString("base64url"), auth: randomBytes(16).toString("base64url") } };
   const vapid = webpush.generateVAPIDKeys();
   const config = { token: "TEST-ONLY-NOT-A-REAL-TOKEN", ...vapid, subject: "https://repbook.example" };
+  const authorization = webpush.getVapidHeaders(new URL(subscription.endpoint).origin, config.subject, config.publicKey, config.privateKey, "aes128gcm").Authorization;
   const now = Date.UTC(2026, 10, 12, 20, 0);
   const state = newState(), workout = newWorkout(state.gyms[0], "Pull", new Date(now));
   state.workouts.push(workout);
   const set = logSet(workout, workout.exercises[0].id, 90, 10, new Date(now));
   const timer = { id: "timer-test", workoutId: workout.id, setId: set.id, endsAt: now + 150_000 };
-  return { key, subscription, config, now, state, workout, set, timer };
+  return { key, subscription, config, authorization, now, state, workout, set, timer };
 }
 
 test("unconfigured push remains unavailable without all valid server settings", () => {
@@ -57,26 +58,31 @@ test("only a persisted current set can schedule its configured, unexpired interv
 });
 
 test("QStash receives encrypted binary and only a generic ready payload", () => {
-  const { key, subscription, config, timer } = fixtures();
-  const request = buildQstashRequest(config, subscription, timer, "hashed-fixture-id");
+  const { key, subscription, config, timer, authorization } = fixtures();
+  const request = buildQstashRequest(config, subscription, timer, "hashed-fixture-id", authorization);
   assert.equal(request.url, `https://qstash.upstash.io/v2/publish/${subscription.endpoint}`);
   assert.equal(request.headers.Authorization, `Bearer ${config.token}`);
   const headers = new Headers(request.headers);
   assert.match(headers.get("upstash-forward-authorization")!, /^vapid /);
+  assert.equal(headers.get("upstash-forward-authorization"), authorization);
   assert.equal(headers.get("upstash-forward-authorization")!.includes(config.token), false);
   assert.equal(headers.get("upstash-forward-ttl"), "60");
   assert.equal(headers.get("upstash-forward-content-encoding"), "aes128gcm");
   assert.equal(headers.get("upstash-retries"), "0");
+  assert.equal(headers.get("upstash-redact-fields"), "body, header[Authorization]");
   assert.equal(headers.get("upstash-not-before"), String(Math.ceil(timer.endsAt / 1000)));
   assert.equal(Buffer.from(request.body).includes(Buffer.from(READY_BODY)), false);
   const decrypted = JSON.parse(ece.decrypt(Buffer.from(request.body), { version: "aes128gcm", privateKey: key, authSecret: subscription.keys.auth }).toString());
   assert.deepEqual(decrypted, { type: "repbook-rest-ready", timerId: timer.id, endsAt: timer.endsAt, title: "Repbook", body: READY_BODY });
   assert.equal(JSON.stringify(decrypted).includes(timer.workoutId), false);
   assert.equal(JSON.stringify(decrypted).includes(timer.setId), false);
+  const another = buildQstashRequest(config, subscription, { ...timer, id: "next-timer" }, "next-hash", authorization);
+  assert.equal(new Headers(another.headers).get("upstash-forward-authorization"), authorization);
+  assert.notDeepEqual(request.body, another.body, "Authorization reuse must not reuse payload encryption.");
 });
 
 test("scheduling retries lost acknowledgements with stable idempotency and no cleartext data", async () => {
-  const { subscription, config, timer } = fixtures();
+  const { subscription, config, timer, authorization } = fixtures();
   const dedupe = await pushDeduplicationId("private-user", "device-1234", timer.id);
   assert.match(dedupe, /^[a-f0-9]{64}$/);
   assert.equal(dedupe, await pushDeduplicationId("private-user", "device-1234", timer.id));
@@ -87,7 +93,7 @@ test("scheduling retries lost acknowledgements with stable idempotency and no cl
     if (requests.length === 1) throw new Error("Lost acknowledgement");
     return Response.json({ messageId: "msg_test", deduplicated: true }, { status: 202 });
   };
-  assert.equal(await schedulePush(config, subscription, timer, dedupe, send), "msg_test");
+  assert.equal(await schedulePush(config, subscription, timer, dedupe, authorization, send), "msg_test");
   assert.equal(requests.length, 2);
   assert.equal(new Headers(requests[0].headers).get("upstash-deduplication-id"), new Headers(requests[1].headers).get("upstash-deduplication-id"));
   assert.deepEqual(requests[0].body, requests[1].body);
@@ -95,13 +101,13 @@ test("scheduling retries lost acknowledgements with stable idempotency and no cl
 });
 
 test("provider errors never become scheduled success and do not expose responses or tokens", async () => {
-  const { subscription, config, timer } = fixtures();
-  await assert.rejects(schedulePush(config, subscription, timer, "test", async () => new Response(`Provider detail ${config.token}`, { status: 401 })), error => {
+  const { subscription, config, timer, authorization } = fixtures();
+  await assert.rejects(schedulePush(config, subscription, timer, "test", authorization, async () => new Response(`Provider detail ${config.token}`, { status: 401 })), error => {
     assert.ok(error instanceof Error);
     assert.equal(error.message.includes(config.token), false);
     return /could not be confirmed/.test(error.message);
   });
-  await assert.rejects(schedulePush(config, subscription, timer, "test", async () => Response.json({ messageId: "../../secrets" })));
+  await assert.rejects(schedulePush(config, subscription, timer, "test", authorization, async () => Response.json({ messageId: "../../secrets" })));
 });
 
 test("cancellation addresses only the known message and reports uncertainty", async () => {

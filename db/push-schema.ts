@@ -25,3 +25,13 @@ export const pushTimers = sqliteTable("push_timers", {
   createdAt: integer("created_at").notNull(),
   updatedAt: integer("updated_at").notNull(),
 }, table => [primaryKey({ columns: [table.userId, table.deviceId, table.timerId] })]);
+
+/** Shared expiring VAPID authorization; never stores the signing private key. */
+export const vapidTokens = sqliteTable("push_vapid_tokens", {
+  publicKey: text("public_key").notNull(),
+  audience: text("audience").notNull(),
+  subject: text("subject").notNull(),
+  authorization: text("authorization").notNull(),
+  refreshAt: integer("refresh_at").notNull(),
+  expiresAt: integer("expires_at").notNull(),
+}, table => [primaryKey({ columns: [table.publicKey, table.audience, table.subject] })]);

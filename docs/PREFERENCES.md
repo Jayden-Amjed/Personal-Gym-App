@@ -56,7 +56,8 @@ Recorded: 2026-11-12 (America/Los_Angeles), GYM-002.
 
 - Add rear delts to Pull. The selected exercise is a rear-delt fly after the back exercises; preserve existing session snapshots.
 - Start rest automatically after logging a new set. Use editable defaults of 2:30 for compound movements and 1:30 for isolation/abs; editing a recorded set must not restart the timer.
-- The desired alert works with the phone locked and music playing through AirPods, saying that the next set is ready. This is a requirement, not a claim that the current web app or Siri has been verified to do it. See [notification setup and limits](NOTIFICATIONS.md).
+- The alert should arrive with the phone locked and music playing. In GYM-003, after a successful direct push test without speech, the user explicitly chose standard push notifications and asked to remove all voice UI and speech behavior. This supersedes the earlier request for a spoken AirPods announcement. See [notification setup and limits](NOTIFICATIONS.md).
+- Show the countdown inside the exercise card being logged, not in a separate top card. Keep the timer running on other app tabs and retain the existing floating countdown there.
 - Record the exercise/machine order actually logged and prior muscle work so earlier and later sets can be compared when considering progressive overload. Do not equate this context with measured fatigue or true strength.
 - Offer an optional photo after finishing each workout. Save it privately with the session date/type and a top-left overlay containing front/back humanoid muscle diagrams followed by the workout label and date, such as `PULL · NOV 12, 2026`.
 - Highlight all mapped muscles trained, including assisting muscles, in red. Derive the overlay from exercises with logged sets; planned but missed exercises do not count. The attached sample is test material and must stay outside public source.

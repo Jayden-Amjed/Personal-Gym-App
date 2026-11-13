@@ -74,18 +74,20 @@ export async function pushDeduplicationId(userId: string, deviceId: string, time
   return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
 }
 
-export function buildQstashRequest(config: PushConfig, subscription: PushSubscription, timer: Pick<PushTimer, "id" | "endsAt">, deduplicationId: string) {
+export function buildQstashRequest(config: PushConfig, subscription: PushSubscription, timer: Pick<PushTimer, "id" | "endsAt">, deduplicationId: string, authorization: string) {
   SubscriptionSchema.parse(subscription);
   const payload = JSON.stringify({ type: "repbook-rest-ready", timerId: timer.id, endsAt: timer.endsAt, title: "Repbook", body: READY_BODY });
   const details = webpush.generateRequestDetails(subscription, payload, {
-    vapidDetails: { subject: config.subject, publicKey: config.publicKey, privateKey: config.privateKey },
     TTL: 60, urgency: "high", contentEncoding: "aes128gcm", topic: "repbook-rest",
   });
+  // Encrypt each message independently, but reuse the D1-selected VAPID JWT.
+  // Passing vapidDetails here would generate a new authorization on every set.
+  details.headers.Authorization = authorization;
   const headers: Record<string, string> = {
     Authorization: `Bearer ${config.token}`, "Content-Type": "application/octet-stream",
     "Upstash-Not-Before": String(Math.ceil(timer.endsAt / 1000)), "Upstash-Retries": "0", "Upstash-Timeout": "5s",
     "Upstash-Deduplication-Id": deduplicationId,
-    "Upstash-Redact-Fields": "body, headers",
+    "Upstash-Redact-Fields": "body, header[Authorization]",
   };
   // Only transport headers from the trusted library may be forwarded. QStash
   // sees encrypted bytes and the push endpoint, never workout or health data.
@@ -94,8 +96,8 @@ export function buildQstashRequest(config: PushConfig, subscription: PushSubscri
   return { url: `${QSTASH_ORIGIN}/v2/publish/${details.endpoint}`, headers, body: new Uint8Array(details.body!) };
 }
 
-export async function schedulePush(config: PushConfig, subscription: PushSubscription, timer: Pick<PushTimer, "id" | "endsAt">, deduplicationId: string, send: typeof fetch = fetch): Promise<string> {
-  const request = buildQstashRequest(config, subscription, timer, deduplicationId);
+export async function schedulePush(config: PushConfig, subscription: PushSubscription, timer: Pick<PushTimer, "id" | "endsAt">, deduplicationId: string, authorization: string, send: typeof fetch = fetch): Promise<string> {
+  const request = buildQstashRequest(config, subscription, timer, deduplicationId, authorization);
   // A second attempt uses the same dedupe ID, including after a lost response.
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
