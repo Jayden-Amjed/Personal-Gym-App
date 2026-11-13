@@ -14,7 +14,7 @@ Recorded: 2026-11-12 (America/Los_Angeles). This record separates implementation
 | Use the user-supplied Upper order and make Lower identical to Legs. | A later explicit instruction superseded the initial inferred-routine plan. See [preferences](PREFERENCES.md) for the full ordered lists. |
 | Flag a planned exercise with no logged sets when a workout is finished. | Avoid marking an in-progress session as missed prematurely. Record the routine context so later routine edits do not silently rewrite past completion. |
 | Count the training week Monday through Sunday. | A clear initial boundary for weekly set totals; local date handling must be tested at day and week boundaries. |
-| Start with manual food and macro entry. | Delivers calorie/protein/carbohydrate/fat totals without inventing nutrient values or depending on an external food-data account. Food search/barcode support can be a later change. |
+| Keep manual food entry and add static, source-linked food presets in GYM-004. | Official product/menu values fill an editable form, with fractional serving scaling from the original label. Save ordinary food snapshots through the existing journal path; catalog changes never rewrite history. No external nutrition API, new schema, or database migration is needed. Food search/barcode support can be a later change. |
 | Keep source and runtime personal records separate. | GitHub holds app code and workflow context; personal workout, bodyweight, and food records stay out of source control. |
 
 ## GYM-002: session feedback
@@ -35,5 +35,11 @@ Recorded: 2026-11-12 (America/Los_Angeles). These choices implement the feedback
 Notification limits remain explicit: delivery can be late or fail; cancellation at the deadline can race delivery; unresolved provider acknowledgements must not be reported as confirmed cancellation. Finishing/deleting a session on a different device does not currently revoke another device's already queued push.
 
 Source merging, deployment, persistence verification, browser QA, and phone QA are recorded separately in PROJECT_STATUS. Do not treat a design decision in this file as evidence that a feature works.
+
+## GYM-004: food presets
+
+The catalog contains nine David Gold flavors (including seasonal Pumpkin Spice), two Fairlife Nutrition Plan shakes, the currently listed chicken/steak High Protein Cups, one three-taco order, and one large burrito tortilla. Preserve official calories instead of recalculating from macros; fiber and polyols may differ. Quantities range above zero through 100 servings and nutrition scales to one decimal place. Users can correct totals before saving.
+
+The [current Chipotle menu](https://www.chipotle.com/high-protein-meals) lists chicken and steak cups; [launch details](https://newsroom.chipotle.com/2025-12-18-CHIPOTLE-UNVEILS-ITS-FIRST-EVER-HIGH-PROTEIN-MENU-FEATURING-A-NEW-SNACK-READY-HIGH-PROTEIN-CUP) specify four ounces. The [official US nutrition table](https://www.chipotle.com/content/dam/chipotle/menu/nutrition/US-Nutrition-Facts-Paper-Menu-3-2025.pdf) supplies ingredient values. The taco order is three 70-calorie crispy shells plus one total 4 oz chicken, 1 oz cheese, and 4 oz fresh tomato salsa portion: 525 calories, 41 g protein, 35 g carbohydrate, 24 g fat. Restaurant portions vary. Other seasonal cups are excluded without current verified nutrition. Each David/Fairlife variant retains its direct official product URL in `lib/food-presets.ts`.
 
 Expected private app address: `https://jayden-repbook.lucentflair1.chatgpt.site`. This is a configured target, not deployment evidence; use PROJECT_STATUS for the observed release state.

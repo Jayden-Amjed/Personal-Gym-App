@@ -2,9 +2,15 @@
 
 Reviewed: 2026-11-12 (America/Los_Angeles).
 
-State Version: 8 — GYM-003 published to the existing owner-private Site; automatic iPhone delivery remains unverified.
+State Version: 9 — GYM-004 food presets implemented and locally verified; publication pending. GYM-003 remains live.
 
 ## Current change
+
+Task `GYM-004`, branch `codex/GYM-004-food-presets`, adds 15 source-linked presets: nine David Gold flavors, two Fairlife Nutrition Plan shakes, Chipotle chicken/steak High Protein Cups, three crispy chicken/cheese/mild-tomato tacos, and a large burrito flour tortilla. The user confirmed Gold bars and crispy corn shells. Presets fill an editable form; fractional quantities scale the original values, and saving creates an ordinary food entry on the selected date. Custom entry remains available. Invalid quantities block saving, rejected journal updates keep the dialog open, and the longer dialog scrolls on small screens.
+
+This update uses the existing journal schema and requires no new migration. It preserves all GYM-003 code and migration 0002, the existing hosting manifest, database, photos, private audience, and notification settings. No production writes or configuration changes have occurred for GYM-004 yet.
+
+### Already deployed behavior
 
 Task `GYM-003`, branch `codex/GYM-003-notification-setup`, removes all speech synthesis, voice controls, and voice guidance. The automatic countdown now sits inside the matching exercise card after a new set, moves when another exercise is logged, and remains floating on other app tabs or while viewing another workout. Deadlines, reload/cross-tab coordination, push scheduling and cancellation are preserved. Editing a set does not restart rest.
 
@@ -18,6 +24,8 @@ The owner supplied the EU QStash token through a masked Windows credential promp
 
 ## Source and release
 
+- GYM-004 starts from the GYM-003 release receipt `3820fbe0193158798a102406780bd0dfefcbd8bb`. Freshly fetched main and GYM-003 have not changed. The food branch is stacked on GYM-003 because PR #4 is still unmerged; do not deploy main or drop the notification changes. Its implementation and publication receipt will be recorded after commit/deployment. No merge is authorized.
+
 - Canonical GitHub repository: [Jayden-Amjed/Repbook](https://github.com/Jayden-Amjed/Repbook); older Personal-Gym-App links redirect. Freshly fetched main remains `0bd13e2c69c24863102c1f1be9061eeaaca51252`. [PR #4](https://github.com/Jayden-Amjed/Repbook/pull/4) is open and unmerged; its verified implementation is `9e33f3d7374e5b726f09868d4561314a054eda9e` on the branch above. [GitHub Actions run 43356214875](https://github.com/Jayden-Amjed/Repbook/actions/runs/43356214875) succeeded for that implementation.
 - Previous GYM-002 deployed source: `e4cd47edca3b0f35e4ff62b6bed842103d191693`. [PR #2](https://github.com/Jayden-Amjed/Repbook/pull/2) merged as `e7f0476677a94339639f90de0778919fe9743e6d`. [GitHub Actions run 43351764630](https://github.com/Jayden-Amjed/Repbook/actions/runs/43351764630) passed locked install, tests, TypeScript, and build.
 - Private deployment `appgdep_6af674a8e8d4819183e304045cb2e9ad` succeeded at 2026-11-13T02:23:45Z (2026-11-12 local), saved version `appgprj_6af63f525dfc8191ad3be9f66bbd141d~appgver_837d2329bc988191bc5ec08c62756290`, environment revision 0. The Sites helper pushed the exact implementation source and packaged the local build before deployment. This later documentation receipt does not change app code or require redeployment.
@@ -29,6 +37,14 @@ The owner supplied the EU QStash token through a masked Windows credential promp
 - D1 stores the journal and photo metadata; private R2 stores original and composite JPEGs. Authenticated ownership checks guard both metadata and bytes. Deletion tombstones hide images before storage cleanup; failed cleanup can retry on later journal saves.
 
 ## Verification actually completed
+
+GYM-004, Windows / Node 24.22.1, 2026-11-12:
+
+- `node --experimental-strip-types --test tests/*.test.ts`: 35/35 passed. New checks cover label-preserving fractional scaling, invalid quantities, ordinary journal serialization with old entries unchanged, manual corrections, taco portions, and catalog validation.
+- `node node_modules/typescript/bin/tsc --noEmit`, Sites `build-site.mjs` / `npm run build`, and `git diff --check`: passed. The final production build includes the dialog scrolling fix.
+- Independent source review found no actionable quantity, date, validation, or historical-data regressions.
+- Browser QA used the actual FoodForm and app CSS in an ignored loopback-only harness, with synthetic in-memory saves. Verified double servings with a manual calorie correction, half a bar, invalid quantity blocking, selected-date preservation, manual entry, and rejected-save feedback. At 390 × 844, the dialog scrolls and has no horizontal overflow. Preview/server stopped afterward. This is component QA, not an authenticated full-app persistence or physical-iPhone test. No production journal/photo records were touched.
+- Official David/Fairlife product labels and Chipotle menu/ingredient nutrition were checked on this date. Sources and standard-serving assumptions are retained in the catalog and decisions.
 
 Hosted ChatGPT Work, 2026-11-12:
 
@@ -67,7 +83,7 @@ Previously completed GYM-002 checks, isolated loopback preview, 2026-11-12; not 
 
 ## Limits and next action
 
-Next, verify inline/floating countdowns and the real Log set → Notification scheduled → locked-phone push flow on the iPhone, including replacement and cancellation. The earlier direct provider test remains separate evidence. Voice is no longer requested.
+Next, publish the completed GYM-004 branch through the existing hosted Work chat after its explicitly authorized handoff, verifying cloud execution and Sites Git access before building there. The local desktop client's Sites Git 409 was already verified in GYM-003; a new local retry is not evidence of cloud execution. Preserve the existing Site and settings, then record the deployment result. Separately, verify inline/floating countdowns and the real Log set → Notification scheduled → locked-phone push flow on the iPhone, including replacement and cancellation. The earlier direct provider test remains separate evidence. Voice is no longer requested.
 
 Finishing/deleting on a different device does not yet revoke a notification queued by the first device; cancellation at delivery time or after an unknown provider acknowledgement may still allow an alert. Provider acceptance does not guarantee device delivery.
 
