@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { isDeepStrictEqual } from "node:util";
 import { mkdir, writeFile } from "node:fs/promises";
 import { newState, newWorkout, validateState } from "../lib/model.ts";
 
@@ -83,7 +84,7 @@ try {
 } finally {
   if (changed) {
     const latest = await read();
-    const isKnown = knownStates.some(state => JSON.stringify(state) === JSON.stringify(latest.state));
+    const isKnown = knownStates.some(state => isDeepStrictEqual(state, latest.state));
     assert.ok(isKnown, "Concurrent local edits detected: refusing cleanup so unfamiliar data stays intact.");
     const restored = await put(initial.state, latest.revision);
     assert.equal(restored.status, 200, "Could not restore empty local fixture state; retain preview for inspection.");

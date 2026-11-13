@@ -36,6 +36,10 @@ test("Upper follows the user's chosen order and Lower matches Legs", () => {
   assert.deepEqual(ROUTINES.Lower, ROUTINES.Legs);
 });
 
+test("new Pull routines include rear delts after the back movements", () => {
+  assert.deepEqual(ROUTINES.Pull.slice(0, 5), ["T-bar rows", "Cable lat pulldowns", "Close-lat-pulls machine", "Rear-delt fly", "Preacher curls"]);
+});
+
 test("weekly totals use Monday through Sunday and include saved draft sets", () => {
   const state = newState();
   for (const [day, finished] of [[8, true], [9, true], [12, false], [15, true], [16, true]] as const) {
